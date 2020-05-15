@@ -1,0 +1,122 @@
+<!--
+
+  Jeswin Mathew
+  CSE-4381-002
+  Professor David Levine
+
+AES Encryption
+
+Resources used for this project:
+
+https://cryptojs.gitbook.io/docs/
+
+https://stackoverflow.com/questions/51531021/javascript-aes-encryption-and-decryption-advanced-encryption-standard
+
+https://www.comparitech.com/blog/information-security/what-is-aes-encryption/
+
+https://www.comparitech.com/blog/information-security/what-is-aes-encryption/#How_does_AES_work
+
+http://cryptojs.altervista.org/secretkey/doc/doc_aes_cryptojs.html
+
+-->
+
+
+
+<!-- basic html document created to display webpage -->
+<head>
+</head>
+<head>
+  <meta charset="utf-8" />
+  <title>Encryption</title>
+  <meta name="description" content="Hstring string hasher" />
+  <meta name="viewport" content="width=device-width" />
+  <link rel="stylesheet" href="hash.css" />
+</head>
+
+<header id="header">
+    <div class="row">
+      <div class="logo-icon">
+      </div>
+      <div class="page-header">
+      	<!-- writing the header page's title -->
+        AES Encryption
+      </div>
+    </div>
+  </header>
+
+  <br><br><br>
+
+<main id="body">
+  <div class="row">
+	<div class="page-container">
+	  <div class="center-pane">
+		<div class="row center">
+            <div class="">
+            	<h5 class="light message-box">A simple implementation of encyrption by AES: Advanced Encryption Standard</h5>
+            	<form action="/action_page.php">
+  				<label for="string_input">Enter a string input to encrypt by AES</label>
+  				<input placeholder=" string " type="text" id="aes_input" name="string"><br><br>
+  
+  				<label for="key_input">Enter Key for AES</label>
+  				<input placeholder=" key " type="text" id="aes_key" name="key"><br><br>
+    			<button type ="button" onclick="AES()">Submit</button>
+  				<label for="aes_output"> <br> <br> After Encryption: </label> 
+  			<label id="final_aes"></label>
+  			<input type="text" id="message" name="string" style="display: none;" ><br><br>
+			</form>
+			</div>
+		</div>
+	</div>
+</main>
+
+<!--
+  <h5 class="light message-box">A simple implementation of encyrption by AES: Advanced Encryption Standard</h5>  -->
+
+<!-- Scripts needed to be imported to make AES work -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/core.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/pbkdf2.js"></script>
+
+<!-- javascript function written for AES encryption -->
+<script>
+
+	const AES = () => {
+		
+		//taking in user input for the string and the key
+		const aes_input = document.querySelector("#aes_input").value;
+		console.log(message);
+		const aes_key = document.querySelector("#aes_key").value;
+
+		//different key lengths to create the AES encrption cipher
+		const size = 32
+		const sz_key_64 = 64/size
+		const sz_key_128 = 128/size
+		const sz_key_256 = 256/size
+		const num_times = 100
+
+		//creating a randomized salt value
+		var rando_salt_val = CryptoJS.lib.WordArray.random(sz_key_128);
+
+		//creating  a variable which stores the mix of the AES key and the randomized salt value and comes up with series of other keys for each round of encryption process.
+		var key_pairs = CryptoJS.PBKDF2(aes_key, rando_salt_val, {
+			keySize: sz_key_256,
+			iterations: num_times
+		}) 
+		var intialization_vector = CryptoJS.lib.WordArray.random(sz_key_128)
+
+		//division of the plaintext into blocks for encryption and adding in the intialization vector
+		var blocks_encrypted = CryptoJS.AES.encrypt(aes_input, key_pairs, {
+			iv: intialization_vector,
+			padding: CryptoJS.pad.Pkcs7,
+			mode: CryptoJS.mode.CBC
+		});
+
+		//after the round of keys are done in either key size of 64, 128, or 256, the salt value is mixed in with the initilization vector with all the blocks
+		var final_cipher = rando_salt_val.toString() + intialization_vector.toString() + blocks_encrypted.toString();
+		console.log(final_cipher);
+
+		//prints out the final cipher message of it being encrypted
+		document.getElementById('final_aes').innerHTML = final_cipher;
+	}
+
+</script>
